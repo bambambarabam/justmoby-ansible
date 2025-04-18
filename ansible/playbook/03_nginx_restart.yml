@@ -1,9 +1,0 @@
----
-- hosts: all
-  name: Install nginx config onto remote
-  tasks:
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
-      become: yes

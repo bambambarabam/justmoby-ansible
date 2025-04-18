@@ -1,6 +1,6 @@
 ---
-- hosts: all
-  become: true
-  tasks:
-    - name: ensure nginx is at the latest version
-      apt: name=nginx state=latest
+- name: Setup Nginx with PHP-FPM
+  hosts: all
+  become: yes
+  roles:
+    - nginx
