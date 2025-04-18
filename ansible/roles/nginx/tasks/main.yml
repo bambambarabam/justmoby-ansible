@@ -21,7 +21,23 @@
     owner: root
     group: root
     mode: '0644'
+  vars:
+    ssl_enabled: false
   notify: Reload Nginx
+
+- name: Upload nginx config without SSL
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_path }}"
+  vars:
+    ssl_enabled: false
+  notify: Reload Nginx
+
+- name: Ensure nginx is started
+  service:
+    name: nginx
+    state: started
+    enabled: yes
 
 - name: Obtain SSL certificates with certbot
   command: >
@@ -29,4 +45,12 @@
     -d {{ domain_name }}
   args:
     creates: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+  notify: Reload Nginx
+
+- name: Upload nginx config with SSL enabled
+- template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_path }}"
+  vars:
+    ssl_enabled: true
   notify: Reload Nginx
