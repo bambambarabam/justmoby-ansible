@@ -2,3 +2,6 @@
 ansible_python_interpreter: "/usr/bin/python3"
 client_max_body_size: "150m"
 worker_connections: 512
+enable_https_redirect: true
+domain_name: yourdomain.com
+certbot_email: admin@yourdomain.com

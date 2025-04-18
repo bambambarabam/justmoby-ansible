@@ -24,14 +24,25 @@ http {
 
     gzip on;
 
+    {% if enable_https_redirect %}
     server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
+        listen 80;
+        listen [::]:80;
+        server_name {{ domain_name }};
+
+        return 301 https://$host$request_uri;
+    }
+
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name {{ domain_name }};
+
+        ssl_certificate /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/{{ domain_name }}/privkey.pem;
 
         root /var/www/html;
         index index.php index.html index.htm;
-
-        server_name _;
 
         location / {
             try_files $uri $uri/ =404;
@@ -46,4 +57,27 @@ http {
             deny all;
         }
     }
+    {% else %}
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name {{ domain_name }};
+
+        root /var/www/html;
+        index index.php index.html index.htm;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        location ~ \.php$ {
+            include snippets/fastcgi-php.conf;
+            fastcgi_pass {{ php_fpm_socket }};
+        }
+
+        location ~ /\.ht {
+            deny all;
+        }
+    }
+    {% endif %}
 }
